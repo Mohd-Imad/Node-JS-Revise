@@ -1,0 +1,28 @@
+.modal-wrapper{
+    height: 95vh;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-container{
+    margin: auto;
+    position: relative;
+    width: 90%;
+    border-radius: 10px;
+    box-shadow: 3px 1px 10px #000;
+}
+
+.close-icon{
+    position: absolute;
+    font-size: large;
+    right: 1.5rem;
+    top:2rem;
+    padding: 0.5rem;
+}
+
+.close-icon:hover{
+    cursor: pointer;
+    box-shadow: 1px 1px 5px #000;
+}

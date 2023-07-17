@@ -1,0 +1,40 @@
+
+//Register user
+/*
+URL            : http://localhost:7000/users
+method         : POST
+required field : fname, mobile, email, password
+*/
+********************************************************
+//get all users
+/*
+URL            : http://localhost:7000/users
+method         : GET
+required field : N/A
+*/
+********************************************************
+
+//get single user
+/*
+URL            : http://localhost:7000/users/:id
+method         : GET
+required field : id
+*/
+********************************************************
+
+//Update user / edit user
+/*
+URL            : http://localhost:7000/users/:id
+method         : PATCH
+required field : id
+*/
+********************************************************
+
+// Delete user
+/*
+URL            : http://localhost:7000/users/:id
+method         : DELETE
+required field : id
+*/
+
+********************************************************
