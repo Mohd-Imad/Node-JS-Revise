@@ -39,7 +39,7 @@ router.post("/users", async (req, res) => {
         const createUser = await registerUser.save()
         res.status(201).send({ msg: "User created successful..!", createdUser: createUser })
     } catch (e) {
-        res.status(400).send(e)
+        res.status(404).send(e)
     }
 })
 
@@ -103,9 +103,9 @@ router.post("/login", async (req, res) => {
         console.log("the token part " + token);
 
         if (isMatch) {
-            res.send("Login success...!")
+            res.status(200).send("Login success...!")
         } else {
-            res.send("InValid Password...!")
+            res.status(401).send("InValid Password...!")
         }
 
     } catch (e) {
