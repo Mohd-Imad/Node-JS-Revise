@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom';
+import bcrypt from 'bcryptjs'
+import Cookies from 'js-cookie'
 
 
 const LoginForm = () => {
@@ -9,8 +11,7 @@ const LoginForm = () => {
     password: ''
   });
   const [errors, setErrors] = useState({});
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const validateForm = () => {
     let valid = true;
@@ -33,27 +34,39 @@ const LoginForm = () => {
     return valid;
   };
 
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (validateForm()) {
       try {
-        const response = await axios.post('http://127.0.0.1:7000/login', user);
-        
-        alert('Login successful:', response.data);
-        console.log('Login successful:', response.data);
-
-        // Reset form
-        setUser({
-          email: '',
-          password: ''
+        const response = await axios.post('http://127.0.0.1:7000/login', {
+          email: user.email,
+          password: user.password
         });
-        setErrors({});
-        setIsLoggedIn(true);
-        navigate('/')
+
+        // Response from the server should include a token to indicate successful login
+        if (response.data.token) {
+          Cookies.set('jwtCookie', response.data.token, { expires: 1 });
+          // localStorage.setItem('token', response.data.token)
+          alert('Login successful...!');
+          console.log('Login successful...!', response.data);
+
+          // Reset form
+          setUser({
+            email: '',
+            password: ''
+          });
+          setErrors({});
+          navigate('/');
+        } else {
+          // Handle login failures
+          alert('Invalid email or password. Please check your credentials and try again.');
+        }
       } catch (error) {
-        alert('Login error:', error);
-        console.error('Login error:', error);
+        // Handle other errors
+        alert('Login error..!', error.message);
+        console.error('Login error...!', error);
       }
     }
   };
@@ -66,20 +79,12 @@ const LoginForm = () => {
     }));
   };
 
-  const handleLogout = () => {
-    setIsLoggedIn(false);
-    alert("Logout Success")
-    console.log("Logout Success")
-    // Route to the login page or another appropriate route
-    navigate('/login');
-  };
-
   return (
     <div className="container mt-5">
       <div className="col-4">
         <div className="card">
           <div className="card-header bg-dark text-light">
-            <h2>Login Form</h2>
+            <h2>Login</h2>
           </div>
           <div className="card-body">
             <form onSubmit={handleSubmit}>
@@ -115,9 +120,6 @@ const LoginForm = () => {
               </div>
               <button type="submit" className="btn btn-primary">
                 Login
-              </button>
-              <button type="button" className="btn btn-danger" onClick={handleLogout}>
-                Logout
               </button>
             </form>
           </div>

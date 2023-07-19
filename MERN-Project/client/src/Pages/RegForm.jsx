@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom'
-
+import { useNavigate } from 'react-router-dom';
+import Cookies from 'js-cookie';
 
 const RegForm = () => {
   const [user, setUser] = useState({
@@ -13,7 +13,7 @@ const RegForm = () => {
     confirm_password: ''
   });
   const [errors, setErrors] = useState({});
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const validateForm = () => {
     let valid = true;
@@ -43,6 +43,9 @@ const RegForm = () => {
     if (user.password.trim() === '') {
       newErrors.password = 'Password is required';
       valid = false;
+    } else if (user.password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters long';
+      valid = false;
     }
 
     if (user.confirm_password.trim() === '') {
@@ -57,12 +60,23 @@ const RegForm = () => {
     return valid;
   };
 
+  const token = Cookies.get('jwtCookie'); // Use the correct cookie name 'jwtCookie'
+  console.log(token);
+
+  const api = axios.create({
+    baseURL: 'http://127.0.0.1:7000', // Your API base URL without '/users'
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (validateForm()) {
       try {
-        const response = await axios.post('http://127.0.0.1:7000/users', user);
+        const response = await api.post('/users', user); // Use the 'api' instance to make the request
+        Cookies.set('jwtCookie', response.data.token, { expires: 1 });
         alert('Registration successful...!', response.data);
         console.log('Registration successful...!', response.data);
 
@@ -76,9 +90,15 @@ const RegForm = () => {
           confirm_password: ''
         });
         setErrors({});
-        navigate('/login')
+        navigate('/login');
       } catch (error) {
-        alert('Registration error..!', error);
+        if (error.response && error.response.status === 409) {
+          // Handle conflict error (409) when a user with the same email already exists
+          alert('User with this email already exists. Please use a different email.');
+        } else {
+          // Handle other errors
+          alert('Registration error..!', error.message);
+        }
         console.error('Registration error...!', error);
       }
     }
@@ -94,14 +114,14 @@ const RegForm = () => {
 
   return (
     <div className="container mt-5">
-      <div className="col-4">
+      <div className="col-6">
         <div className="card">
           <div className="card-header bg-dark text-light">
-            <h2>Registration Form</h2>
+            <h2>Registration</h2>
           </div>
           <div className="card-body">
             <form onSubmit={handleSubmit}>
-              <div className="mb-2">
+              <div className="mb-3">
                 <label htmlFor="fname" className="form-label">
                   First name
                 </label>
@@ -116,21 +136,20 @@ const RegForm = () => {
                 />
                 {errors.fname && <div className="invalid-feedback">{errors.fname}</div>}
               </div>
-              <div className="mb-2">
+              <div className="mb-3">
                 <label htmlFor="lname" className="form-label">
                   Last name (optional)
                 </label>
                 <input
                   type="text"
-                  className={`form-control`}
+                  className="form-control"
                   id="lname"
                   name="lname"
                   value={user.lname}
                   onChange={handleInputChange}
-                  required
                 />
               </div>
-              <div className="mb-2">
+              <div className="mb-3">
                 <label htmlFor="mobile" className="form-label">
                   Mobile
                 </label>
@@ -145,7 +164,7 @@ const RegForm = () => {
                 />
                 {errors.mobile && <div className="invalid-feedback">{errors.mobile}</div>}
               </div>
-              <div className="mb-2">
+              <div className="mb-3">
                 <label htmlFor="email" className="form-label">
                   Email
                 </label>
@@ -160,7 +179,7 @@ const RegForm = () => {
                 />
                 {errors.email && <div className="invalid-feedback">{errors.email}</div>}
               </div>
-              <div className="mb-2">
+              <div className="mb-3">
                 <label htmlFor="password" className="form-label">
                   Password
                 </label>
@@ -175,7 +194,7 @@ const RegForm = () => {
                 />
                 {errors.password && <div className="invalid-feedback">{errors.password}</div>}
               </div>
-              <div className="mb-2">
+              <div className="mb-3">
                 <label htmlFor="confirm_password" className="form-label">
                   Confirm Password
                 </label>
@@ -188,7 +207,9 @@ const RegForm = () => {
                   onChange={handleInputChange}
                   required
                 />
-                {errors.confirm_password && <div className="invalid-feedback">{errors.confirm_password}</div>}
+                {errors.confirm_password && (
+                  <div className="invalid-feedback">{errors.confirm_password}</div>
+                )}
               </div>
               <button type="submit" className="btn btn-primary">
                 Register

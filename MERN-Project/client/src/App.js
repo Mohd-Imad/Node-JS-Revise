@@ -5,10 +5,8 @@ import Navbar from './Pages/Components/Navbar';
 import RegForm from './Pages/RegForm';
 import LoginForm from './Pages/LoginForm';
 import Secret from './Pages/Secret';
-import { useState } from 'react';
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
   return (
     <>
     <Router>
