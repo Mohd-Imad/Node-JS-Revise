@@ -7,42 +7,45 @@ require('./db/myconn')
 const userRouter = require('./router/userRouter')
 
 const app = express()
-let port=process.env.PORT || 7000
+let port = process.env.PORT || 7000
 
 app.use(express.json()) //to read form data
 app.use(cookieParser())
-app.use(express.urlencoded({extended:false}))
+app.use(express.urlencoded({ extended: false }))
 app.use(cors())
 
-app.get('/',(req,res)=>{
+app.get('/', (req, res) => {
    res.send('<h1>Server is running successfully</h1>')
 })
 
-app.get('/secret',auth,(req,res)=>{
+/* app.get('/secret', auth, (req, res) => {
    console.log(req.cookies.newCookie);
    res.send(`This is a cookie: ${req.cookies.newCookie}`) //to get cookie
-})
+}) */
 
-app.get('/logout',auth,async (req,res)=>{
-   try{
+/* app.get('/logout', auth, async (req, res) => {
+   try {
 
       //to logout from current device
-      req.user.tokens = req.user.tokens.filter((currentDev)=>{
+      req.user.tokens = req.user.tokens.filter((currentDev) => {
          return currentDev.token !== req.token
       })
 
       //to logout from all devices
       // req.user.tokens = []
 
+      // Clear the cookie (optional if you are using cookies)
       res.clearCookie("newCookie")
       console.log("Logout successful...!");
 
+      // Save the updated user data
       await req.user.save()
-      res.send("Cookie deleted")
-   }catch(err){
+      res.send("Logout Successful")
+   } catch (err) {
       res.status(500).send(err)
    }
-})
+}) */
+
 
 app.use(userRouter)
 
@@ -57,7 +60,7 @@ const createToken = async()=>{
 createToken() */
 
 
-app.listen(port,(err)=>{
-    if(err)throw err
+app.listen(port, (err) => {
+   if (err) throw err
    console.log(`Server is listening to http://localhost:${port}`);
 })
